@@ -22,3 +22,6 @@ Thumbs.db
 # Optional: common ROS logs / generated data
 *.bag
 *.log
+
+# UV environment files
+slam_env/

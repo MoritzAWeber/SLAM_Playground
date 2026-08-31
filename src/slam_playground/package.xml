@@ -3,8 +3,8 @@
 <package format="3">
   <name>slam_playground</name>
   <version>0.0.0</version>
-  <description>Simple SLAM-Implementation for learning purposes.</description>
-  <maintainer email="moritz.a.weber02@gmail.com">root</maintainer>
+  <description>Educational ROS 2 laser-scan analysis and occupancy-grid mapping nodes.</description>
+  <maintainer email="moritz.a.weber02@gmail.com">Moritz Weber</maintainer>
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
@@ -12,6 +12,9 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>tf2_ros</depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
