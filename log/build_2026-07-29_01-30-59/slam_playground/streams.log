@@ -1,0 +1,23 @@
+[2.588s] Invoking command in '/home/moritz/slam_sim_ws/build/slam_playground': PYTHONPATH=/home/moritz/slam_sim_ws/build/slam_playground/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/moritz/slam_sim_ws/install/slam_playground/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/moritz/slam_sim_ws/build/slam_playground/build --no-deps symlink_data
+[3.147s] running develop
+[3.429s] running egg_info
+[3.460s] writing slam_playground.egg-info/PKG-INFO
+[3.461s] writing dependency_links to slam_playground.egg-info/dependency_links.txt
+[3.462s] writing entry points to slam_playground.egg-info/entry_points.txt
+[3.462s] writing requirements to slam_playground.egg-info/requires.txt
+[3.463s] writing top-level names to slam_playground.egg-info/top_level.txt
+[3.519s] reading manifest file 'slam_playground.egg-info/SOURCES.txt'
+[3.521s] writing manifest file 'slam_playground.egg-info/SOURCES.txt'
+[3.555s] running build_ext
+[3.555s] Creating /home/moritz/slam_sim_ws/install/slam_playground/lib/python3.12/site-packages/slam-playground.egg-link (link to .)
+[3.555s] Installing fake_laser script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.557s] Installing laser_simulator script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.558s] Installing robot_motion script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.559s] Installing scan_analyzer script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.559s] Installing simple_mapper script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.559s] Installing simple_mapper_new script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.559s] Installing system_check script to /home/moritz/slam_sim_ws/install/slam_playground/lib/slam_playground
+[3.560s] 
+[3.560s] Installed /home/moritz/slam_sim_ws/build/slam_playground
+[3.560s] running symlink_data
+[3.623s] Invoked command in '/home/moritz/slam_sim_ws/build/slam_playground' returned '0': PYTHONPATH=/home/moritz/slam_sim_ws/build/slam_playground/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/moritz/slam_sim_ws/install/slam_playground/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/moritz/slam_sim_ws/build/slam_playground/build --no-deps symlink_data
