@@ -1,58 +1,102 @@
 # AGENTS.md
 
-## Scope
+## Purpose
+
+This repository contains a ROS 2 Jazzy project for implementing and evaluating 2D SLAM components.
 
 Codex is used in this repository only for documentation and dependency metadata maintenance.
 
-Do not modify application source code, ROS node logic, launch behavior, algorithms, tests, or runtime behavior unless explicitly requested.
+Codex must not modify runtime behavior, application logic, algorithms, ROS node implementations, or launch behavior unless explicitly instructed.
 
-Allowed files include:
+## Allowed files
+
+Codex may modify:
+
 - `README.md`
+- `TODO.md`
 - `pyproject.toml`
 - `package.xml`
-- documentation files
-- comments/docstrings only when explicitly requested
+- other documentation files
+- comments or docstrings only when explicitly requested
 
-## Documentation workflow
+Application source files must not be modified as part of routine documentation maintenance.
 
-Before changing documentation:
+## Repository inspection
 
-1. Inspect the repository structure.
-2. Inspect the current ROS nodes and executable entry points.
-3. Inspect launch files.
-4. Inspect imports and dependencies.
-5. Compare the repository state with the existing documentation.
+Before updating documentation or metadata, inspect the repository and derive facts from the actual implementation.
 
-Update documentation only when the repository supports the change.
+Relevant sources include:
 
-Do not invent features, commands, topics, frames, executables, dependencies, or future functionality.
+- ROS package manifests
+- Python package configuration
+- launch files
+- executable entry points
+- node implementations
+- imports
+- topic names
+- TF frame names
+- existing documentation
 
-## README
+Do not assume filenames, executable names, topics, frames, dependencies, or implemented features without verifying them.
 
-Keep `README.md` synchronized with the actual project.
+## Documentation requirements
 
-Verify:
+Keep the project documentation synchronized with the repository.
+
+Documentation should accurately describe:
+
 - project purpose
-- current architecture
-- package structure
-- node names
+- repository structure
+- ROS packages
+- nodes and their responsibilities
 - executable names
-- launch commands
+- launch files
 - ROS topics
-- TF frames
+- message types
+- TF frames and frame relationships
+- configuration and dependencies
 - build instructions
 - run instructions
-- current limitations
+- implemented functionality
+- known limitations
 
-Do not describe planned functionality as implemented.
+Do not document planned functionality as implemented functionality.
 
-Do not describe the mapper as full SLAM unless pose correction / localization is actually implemented.
+When implementation details are unclear or cannot be verified from the repository, state that explicitly instead of guessing.
 
-## Dependencies
+## Technical terminology
 
-ROS dependencies belong in `package.xml`.
+Use ROS terminology consistently.
 
-Examples:
+Distinguish between:
+
+- mapping
+- localization
+- odometry
+- scan matching
+- SLAM
+- loop closure
+- pose graph optimization
+
+Do not describe a mapping implementation as full SLAM unless the repository contains pose estimation or correction based on sensor observations.
+
+Use frame names exactly as implemented.
+
+Typical frame responsibilities may include:
+
+- `map`: global corrected reference frame
+- `odom`: locally continuous odometry reference frame
+- `base_link`: robot-fixed base frame
+- `laser_frame`: sensor-fixed frame
+
+Only document frames that are actually present in the repository.
+
+## Dependency management
+
+ROS dependencies must be declared in `package.xml`.
+
+Examples include:
+
 - `rclpy`
 - `nav_msgs`
 - `sensor_msgs`
@@ -60,44 +104,112 @@ Examples:
 - `tf2_ros`
 - `visualization_msgs`
 
-Regular Python dependencies belong in `pyproject.toml`.
+ROS packages must not be added as ordinary PyPI dependencies.
 
-Examples:
+Non-ROS Python dependencies should be declared in `pyproject.toml`.
+
+Examples include:
+
 - `numpy`
 - `scipy`
 
-Only add dependencies that are actually required by the repository.
+Only declare dependencies that are actually required by the project.
 
-Do not infer dependencies from packages installed on the developer machine.
+Do not derive project dependencies from packages installed globally on the development system.
 
-## Project context
+## Python packaging
 
-This is a ROS 2 Jazzy SLAM learning project.
+When maintaining `pyproject.toml`:
 
-The intended TF hierarchy is:
+1. inspect imports used by the project
+2. separate ROS dependencies from ordinary Python dependencies
+3. preserve compatibility with the existing ROS packaging approach
+4. avoid replacing or restructuring package configuration unless explicitly requested
+5. do not add unused dependencies
 
-`map -> odom -> base_link -> laser_frame`
+## README maintenance
 
-The current mapper may still use odometry directly and should be described as occupancy mapping with an odometry/known pose until pose correction is implemented.
+When updating `README.md`, verify that documented commands match the repository.
 
-## Safety for repository changes
+In particular, verify:
 
-Do not:
-- modify `.py` application files
-- rewrite algorithms
-- change ROS behavior
-- rename nodes or executables
-- alter launch behavior
-- perform broad refactors
+- workspace layout
+- package names
+- executable names
+- launch filenames
+- build commands
+- source commands
+- run commands
+- topic names
+- frame names
+- dependency installation instructions
 
-If documentation appears inconsistent because source code may be wrong, report the inconsistency instead of changing the source code.
+Prefer concise, reproducible commands over machine-specific assumptions.
+
+Avoid documenting local absolute paths unless they are required.
+
+## TODO maintenance
+
+Maintain `TODO.md` as the source of project-level open work.
+
+A TODO entry should represent a concrete, verifiable task.
+
+Appropriate TODOs include:
+
+- missing functionality
+- incomplete documentation
+- unresolved technical limitations
+- known inconsistencies
+- missing tests
+- unimplemented interfaces
+- dependency or packaging issues
+
+Do not add speculative tasks without evidence from the repository.
+
+Do not duplicate existing TODO items.
+
+Do not resolve TODOs by modifying application source code unless explicitly instructed.
+
+A TODO may be marked complete or removed only when the repository clearly shows that the task has been resolved.
+
+## Source code protection
+
+During documentation maintenance, do not:
+
+- modify Python application logic
+- change ROS node behavior
+- change algorithms
+- rename topics
+- rename frames
+- rename executables
+- change launch behavior
+- perform refactors
+- alter tests
+- change runtime configuration
+
+If documentation reveals a likely source-code issue, document or report the inconsistency rather than changing the implementation.
 
 ## Validation
 
-Before finishing:
+Before completing a documentation task:
 
-1. Review `git diff`.
-2. Confirm that only documentation or dependency metadata files were changed.
-3. Verify documented commands and names against the repository.
-4. Summarize what was updated.
-5. Mention anything that could not be verified.
+1. inspect the relevant repository files
+2. review all changes with `git diff`
+3. confirm that only permitted files were modified
+4. verify documented executable names
+5. verify documented launch files
+6. verify documented topics and frames
+7. verify dependency declarations against actual usage
+8. review `TODO.md` for duplicates and obsolete entries
+
+Do not claim that a command, build, test, or runtime behavior was verified unless it was actually executed.
+
+## Final report
+
+At the end of a documentation task, provide a concise summary containing:
+
+- files changed
+- documentation or metadata updated
+- inconsistencies found
+- unresolved items
+- checks that were performed

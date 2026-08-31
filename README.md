@@ -1,50 +1,34 @@
 # SLAM Playground
 
-`slam_playground` is a ROS 2 Jazzy learning project that simulates a robot,
-a 2D laser scanner, and a simple occupancy-grid mapper. The robot follows a
-known circular trajectory inside a square room, the simulated scanner measures
-the room walls, and the mapper places scan endpoints into a persistent grid
-using the simulated odometry pose.
+`slam_playground` is a ROS 2 Jazzy learning project for simulating a moving
+robot, generating idealized 2D laser scans, and building an occupancy grid.
 
-Despite the repository name, this is **not a complete SLAM system**. There is
-no scan matching, localization, loop closure, pose correction, or
-`map -> odom` transform. Mapping currently relies directly on known odometry.
+The current implementation is an odometry-based mapper, not a complete SLAM
+system. It uses the robot pose from simulated odometry to place laser endpoints
+in a grid. It does not estimate or correct the pose from sensor observations.
 
-## Current system
+## What is built
 
-The main demo consists of three nodes started by
-`moving_robot.launch.py`:
+The `moving_robot.launch.py` launch file starts three nodes:
 
-```text
-robot_motion_node
-  |-- /odom ----------------> laser_simulator
-  |       |                         |-- /scan
-  |       +-------------------------+-------> simple_mapper
-  |-- odom -> base_link TF                 |-- /map
-  +-- base_link -> laser_frame static TF
-
-laser_simulator
-  +-- /scan_rays
-```
-
-| Executable | ROS node name | Role |
+| Executable | Node name | Responsibility |
 | --- | --- | --- |
-| `robot_motion` | `robot_motion_node` | Moves the robot around a circle of radius 1.5 m and publishes its known pose at 5 Hz. |
-| `laser_simulator` | `laser_simulator` | Casts 360 rays against the walls of an 8 m x 8 m square room and publishes scans and visualization markers at 5 Hz. |
-| `simple_mapper_new` | `simple_mapper` | Transforms scan endpoints with the odometry pose and accumulates them in an occupancy grid. |
-| `system_check` | `system_check` | Standalone heartbeat node that logs once per second; it is not part of the demo launch. |
+| `robot_motion` | `robot_motion_node` | Publishes exact odometry for a robot following a circle and broadcasts the robot TF frames. |
+| `laser_simulator` | `laser_simulator` | Casts 360 idealized rays against the walls of a square room. |
+| `simple_mapper` | `simple_mapper` | Uses odometry and scan endpoints to accumulate occupied cells in an occupancy grid. |
 
-The executable name `simple_mapper_new` is retained in the package metadata,
-although the node itself is named `simple_mapper`.
+The simulated robot moves on a circle with a radius of 1.5 m. The laser scans
+an 8 m by 8 m square room at 5 Hz with a range of 0.1 m to 8.0 m. The mapper
+publishes a 12 m by 12 m grid at 0.05 m per cell.
 
-## ROS interfaces
+### ROS interfaces
 
-| Topic | Type | Publisher | Subscriber | Description |
+| Topic | Type | Publisher | Subscriber | Purpose |
 | --- | --- | --- | --- | --- |
-| `/odom` | `nav_msgs/msg/Odometry` | `robot_motion_node` | `laser_simulator`, `simple_mapper` | Simulated robot pose in `odom`. |
-| `/scan` | `sensor_msgs/msg/LaserScan` | `laser_simulator` | `simple_mapper` | 360-degree scan in `laser_frame`, with a 0.1-8.0 m range. |
-| `/scan_rays` | `visualization_msgs/msg/Marker` | `laser_simulator` | None | A `LINE_LIST` marker containing every tenth simulated ray. |
-| `/map` | `nav_msgs/msg/OccupancyGrid` | `simple_mapper` | None | 12 m x 12 m grid at 0.05 m/cell, expressed in `odom`. |
+| `/odom` | `nav_msgs/msg/Odometry` | `robot_motion_node` | `laser_simulator`, `simple_mapper` | Exact simulated robot pose. |
+| `/scan` | `sensor_msgs/msg/LaserScan` | `laser_simulator` | `simple_mapper` | Simulated 360-degree laser scan. |
+| `/scan_rays` | `visualization_msgs/msg/Marker` | `laser_simulator` | — | Visualization of every tenth laser ray. |
+| `/map` | `nav_msgs/msg/OccupancyGrid` | `simple_mapper` | — | Accumulated occupied scan endpoints. |
 
 The implemented TF tree is:
 
@@ -52,27 +36,23 @@ The implemented TF tree is:
 odom -> base_link -> laser_frame
 ```
 
-`odom -> base_link` changes with the simulated motion.
-`base_link -> laser_frame` is static and currently has zero translation and
-rotation. No `map` frame is published; the occupancy grid uses `odom` as its
-header frame.
+`odom -> base_link` follows the simulated motion. `base_link -> laser_frame`
+is static with zero translation and rotation. The occupancy grid is expressed
+in `odom`; there is no `map` TF frame.
 
-## Requirements
-
-- Ubuntu 24.04 with ROS 2 Jazzy
-- `colcon` and `rosdep`
-- Python 3.12, as provided by the standard ROS 2 Jazzy platform
-- NumPy
-
-The ROS package declares `rclpy`, `sensor_msgs`, `nav_msgs`, `geometry_msgs`,
-and `tf2_ros`. The current code also imports `visualization_msgs`, and the
-mapper imports NumPy, but those two runtime dependencies are not yet declared
-in the repository metadata. They must already be available in the environment
-for the complete demo to run.
+The mapper marks valid scan endpoints as occupied (`100`). Unobserved cells
+remain unknown (`-1`). It does not mark free space along a ray.
 
 ## Build
 
-Run the following commands from the repository root:
+Requirements:
+
+- Ubuntu 24.04 and ROS 2 Jazzy
+- `colcon` and `rosdep`
+- Python 3.12
+- NumPy
+
+From the repository root:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -81,39 +61,30 @@ colcon build --symlink-install --packages-select slam_playground
 source install/setup.bash
 ```
 
-The setup file installs the launch file with the package, so the demo can be
-started after sourcing the workspace.
+ROS dependencies are declared in `src/slam_playground/package.xml`. The NumPy
+dependency is declared in `pyproject.toml`.
 
 ## Run
 
-Start all three simulation and mapping nodes:
+After sourcing ROS 2 and the built workspace:
 
 ```bash
 ros2 launch slam_playground moving_robot.launch.py
 ```
 
-Alternatively, run them in separate terminals after sourcing ROS 2 and the
-workspace in each terminal:
+To run the nodes separately, source the environment in each terminal and start
+the odometry publisher first:
 
 ```bash
 ros2 run slam_playground robot_motion
 ros2 run slam_playground laser_simulator
-ros2 run slam_playground simple_mapper_new
+ros2 run slam_playground simple_mapper
 ```
 
-The laser simulator and mapper wait for the first odometry message before
-producing useful output. Start `robot_motion` first when launching the nodes
-manually.
+For RViz 2, use `odom` as the fixed frame and add `/map`, `/scan`,
+`/scan_rays`, and TF displays. No RViz configuration is included.
 
-The standalone heartbeat can be run with:
-
-```bash
-ros2 run slam_playground system_check
-```
-
-## Inspect the demo
-
-Useful ROS 2 checks include:
+Useful inspection commands:
 
 ```bash
 ros2 node list
@@ -124,13 +95,9 @@ ros2 topic echo /map --once
 ros2 run tf2_ros tf2_echo odom base_link
 ```
 
-If RViz 2 is installed, use `odom` as the fixed frame and add displays for the
-occupancy grid (`/map`), laser scan (`/scan`), marker (`/scan_rays`), and TF.
-The repository does not currently include an RViz configuration.
-
 ## Tests
 
-The package contains the standard ament Flake8, PEP 257, and copyright test
+The package includes the standard ament Flake8, PEP 257, and copyright test
 wrappers:
 
 ```bash
@@ -138,48 +105,38 @@ colcon test --packages-select slam_playground
 colcon test-result --verbose
 ```
 
-The copyright test is currently skipped by its test file.
-The current test suite does not pass: the Flake8 test reports existing style
-violations in the package sources, launch file, and `setup.py`.
+The copyright test is explicitly skipped. No functional tests currently
+exercise the simulation or mapper. Test results have not been verified as part
+of this documentation update.
 
-## Current limitations
+## What remains to do
 
-- Robot motion is scripted and odometry is exact; no motion model or odometry
-  noise is simulated.
-- The world contains only the four walls of a fixed square room.
-- The laser model has no noise, missed returns, or dynamic obstacles.
-- The mapper uses odometry directly and performs no pose estimation or
-  correction.
-- Only valid scan endpoints are marked occupied (`100`). Free space along each
-  ray is not cleared, and untouched cells remain unknown (`-1`).
-- The map is published in `odom`; the intended future SLAM hierarchy
-  `map -> odom -> base_link -> laser_frame` is not implemented.
-- `setup.py` still registers `fake_laser`, `scan_analyzer`, and `simple_mapper`
-  console scripts whose referenced modules are absent. Use the moving-robot
-  executables documented above.
-- `start_slam.sh` only changes directory and sources environments. It uses a
-  hard-coded workspace path and does not launch any nodes.
+The tracked project work is maintained in [TODO.md](TODO.md). The main gaps are
+functional tests, a less idealized sensor and motion model, free-space mapping,
+and the pose-estimation and correction components required for actual 2D SLAM.
 
 ## Repository layout
 
 ```text
 .
 |-- README.md
+|-- TODO.md
 |-- pyproject.toml
 |-- start_slam.sh
 +-- src/slam_playground/
-    |-- launch/moving_robot.launch.py
     |-- package.xml
-    |-- setup.cfg
     |-- setup.py
-    |-- slam_playground/
-    |   |-- system_check.py
-    |   +-- moving_robot/
-    |       |-- robot_motion_node.py
-    |       |-- laser_simulator_node.py
-    |       +-- simple_mapper_node.py
+    |-- launch/moving_robot.launch.py
+    |-- slam_playground/moving_robot/
+    |   |-- robot_motion_node.py
+    |   |-- laser_simulator_node.py
+    |   +-- simple_mapper_node.py
     +-- test/
 ```
+
+`start_slam.sh` is a local convenience script with a hard-coded workspace
+path. It only sources the ROS 2 and workspace environments; it does not build
+the workspace or launch nodes.
 
 ## License
 

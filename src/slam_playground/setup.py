@@ -30,7 +30,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-		"system_check = slam_playground.system_check:main",
         "robot_motion = slam_playground.moving_robot.robot_motion_node:main",
         "laser_simulator = slam_playground.moving_robot.laser_simulator_node:main",
         "simple_mapper = slam_playground.moving_robot.simple_mapper_node:main",

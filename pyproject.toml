@@ -1,3 +1,8 @@
+[project]
+name = "slam_playground"
+version = "0.0.0"
+dependencies = ["numpy"]
+
 [tool.pytest.ini_options]
 testpaths = ["src/slam_playground/test"]
 markers = [
