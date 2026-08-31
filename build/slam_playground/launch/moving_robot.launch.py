@@ -1,1 +1,0 @@
-/home/moritz/slam_sim_ws/src/slam_playground/launch/moving_robot.launch.py

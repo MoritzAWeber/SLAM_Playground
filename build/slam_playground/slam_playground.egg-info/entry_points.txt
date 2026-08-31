@@ -1,8 +1,0 @@
-[console_scripts]
-fake_laser = slam_playground.fake_laser:main
-laser_simulator = slam_playground.moving_robot.laser_simulator_node:main
-robot_motion = slam_playground.moving_robot.robot_motion_node:main
-scan_analyzer = slam_playground.scan_analyzer:main
-simple_mapper = slam_playground.simple_mapper:main
-simple_mapper_new = slam_playground.moving_robot.simple_mapper_node:main
-system_check = slam_playground.system_check:main
