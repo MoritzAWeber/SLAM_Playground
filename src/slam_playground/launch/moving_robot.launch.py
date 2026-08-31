@@ -17,7 +17,7 @@ def generate_launch_description():
 
         Node(
             package="slam_playground",
-            executable="simple_mapper_new",
+            executable="simple_mapper",
             output="screen",
         ),
     ])

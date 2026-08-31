@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["src/slam_playground/test"]
+markers = [
+    "copyright: checks source-file copyright notices",
+    "flake8: checks PEP 8 style with ament_flake8",
+    "linter: marks ROS 2 ament lint tests",
+    "pep257: checks docstrings with ament_pep257",
+]
